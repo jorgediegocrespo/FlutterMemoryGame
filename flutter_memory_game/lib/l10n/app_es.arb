@@ -1,0 +1,22 @@
+{ 
+    "cancel": "Cancelar",
+    "gameAttemps": "Intentos",
+    "gameBackQuestionMessage": "¿Seguro que desea abandonar el juego sin terminar la partida?",
+    "gameBackQuestionTitle": "Abandonar juego",
+    "gameLoseSubtitle": "El tiempo se ha terminado y no has conseguido encontrar todas las parejas",
+    "gameLoseTitle": "¡¡Juego terminado!!",
+    "gamePairs": "Parejas",
+    "gameWonSubtitle": "Has encontrado todas las parejas antes de que se termine el tiempo",
+    "gameWonTitle": "¡¡Enhorabuena!!",
+    "highLevel": "Difícil",
+    "levelSelectorTitle": "Selecciona el nivel de dificultad con el que quieres jugar",
+    "lowLevel": "Fácil",
+    "mediumLevel": "Medio",
+    "ok": "Sí",
+    "playAgain": "Jugar de nuevo",
+    "themeSelectorDc": "DC",
+    "themeSelectorMarvel": "Marvel",
+    "themeSelectorSimpsons": "Los Simpsons",
+    "themeSelectorStarWars": "Star Wars",
+    "themeSelectorTitle": "Selecciona el tema con el que deseas jugar"
+}

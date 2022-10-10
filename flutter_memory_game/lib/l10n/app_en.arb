@@ -1,0 +1,22 @@
+{
+    "cancel": "Cancel",
+    "gameAttemps": "Attemps",
+    "gameBackQuestionMessage": "Are you sure you want to leave the game without ending the game?",
+    "gameBackQuestionTitle": "Quit game",
+    "gameLoseSubtitle": "Time is up and you haven't managed to discover all the pairs",
+    "gameLoseTitle": "Game over!!",
+    "gamePairs": "Pairs",
+    "gameWonSubtitle": "You have discovered all the pairs before the time runs out",
+    "gameWonTitle": "Congratulations!!",
+    "highLevel": "High",
+    "levelSelectorTitle": "Select the level of difficulty with which you want to play",
+    "lowLevel": "Low",
+    "mediumLevel": "Medium",
+    "ok": "Ok",
+    "playAgain": "Play again",
+    "themeSelectorDc": "DC",
+    "themeSelectorMarvel": "Marvel",
+    "themeSelectorSimpsons": "The Simpsons",
+    "themeSelectorStarWars": "Star Wars",
+    "themeSelectorTitle": "Select the theme you want to play with"
+}
