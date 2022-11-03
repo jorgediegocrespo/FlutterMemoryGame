@@ -30,7 +30,7 @@ class Background extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             child: child,
           ),
         )));
