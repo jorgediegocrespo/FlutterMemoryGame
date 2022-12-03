@@ -3,8 +3,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
+
 import 'package:flutter_memory_game/controls/controls.dart';
+import 'package:flutter_memory_game/main.dart';
 import 'package:flutter_memory_game/models/models.dart';
+import 'package:flutter_memory_game/services/services.dart';
 
 class GameProvider with ChangeNotifier {
   late AnimationController animationController;
@@ -13,6 +18,8 @@ class GameProvider with ChangeNotifier {
   late Animation<double> attempsAnimation;
   late Animation<double> timerAnimation;
   late Animation<double> boardAnimation;
+  late NavigationServiceBase _navigationService;
+  late DialogServiceBase _dialogService;
 
   bool _isNavigatingBack = false;
   int _attempsNumber = 0;
@@ -22,15 +29,20 @@ class GameProvider with ChangeNotifier {
   List<List<GameCardController>>? _boardControllers;
   late Duration _remainingTime;
   late Timer _countdown;
+  late AppLocalizations _texts;
   CardInfo? _currentCard;
   GameCardController? _currentCardController;
   bool _isShowingCard = false;
-  final Future Function(bool gameWon) showGameOver;
 
-  GameProvider({required TickerProvider vsync, required GameInfo gameInfo, required this.showGameOver}) {
+  GameProvider({required TickerProvider vsync, required GameInfo gameInfo}) {
+    _navigationService = GetIt.I<NavigationServiceBase>();
+    _dialogService = GetIt.I<DialogServiceBase>();
+    
+    _texts = AppLocalizations.of(navigatorKey.currentContext!)!;
+    _gameInfo = gameInfo;
+    
     animationController = AnimationController(vsync: vsync, duration: const Duration(seconds: 1));
 
-    _gameInfo = gameInfo;
     _createBoard();
     _initCountdown();
 
@@ -74,7 +86,7 @@ class GameProvider with ChangeNotifier {
   Duration get totalTime {
     switch (_gameInfo.level) {
       case Levels.high:
-        return const Duration(minutes: 2); 
+        return const Duration(minutes: 2);
       case Levels.medium:
         return const Duration(minutes: 4);
       case Levels.low:
@@ -132,7 +144,7 @@ class GameProvider with ChangeNotifier {
       if (_currentCard!.imagePath == selectedCell!.imagePath) {
         cardPairsFound++;
         _currentCard!.found = true;
-        selectedCell!.found = true;
+        selectedCell.found = true;
       } else {
         await Future.delayed(const Duration(milliseconds: 1000));
         await Future.wait([controller.flipCard(), _currentCardController!.flipCard()]);
@@ -149,12 +161,20 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  void goBack(BuildContext context) {
-    
+  Future<void> goBack() async {
+    isNavigatingBack = true;
+    bool goBack = await _dialogService.showAlertDialog(_texts.gameBackQuestionTitle, _texts.gameBackQuestionMessage, _texts.ok, _texts.cancel);
+    if (!goBack) {
+      return;
+    }
+    animationController.reverse().whenCompleteOrCancel(() {
+      _navigationService.navigateBack();
+      isNavigatingBack = false;
+    });
   }
 
   void _createBoard() {
-    _boardControllers ??= List.generate(rowCount, (rowIndex) => List.generate(columnCount, (columnIndex) => GameCardController()));    
+    _boardControllers ??= List.generate(rowCount, (rowIndex) => List.generate(columnCount, (columnIndex) => GameCardController()));
     _board = List.generate(rowCount, (rowIndex) => List.generate(columnCount, (columnIndex) => null));
     final imagePrefix = _getImagePrefix();
 
@@ -264,7 +284,7 @@ class GameProvider with ChangeNotifier {
   void _initCountdown() {
     remainingTime = totalTime;
     _countdown = Timer.periodic(const Duration(seconds: 1), (_) async {
-      remainingTime = Duration(seconds: remainingTime!.inSeconds - 1);
+      remainingTime = Duration(seconds: remainingTime.inSeconds - 1);
       if (remainingTime.inSeconds == 0) {
         await _finishGame(false);
       }
@@ -273,7 +293,8 @@ class GameProvider with ChangeNotifier {
 
   Future<void> _finishGame(bool gameWon) async {
     _countdown.cancel();
-    await showGameOver(gameWon);
+    await _navigationService.navigateToGameOverPopup(gameWon);
+
     _attempsNumber = 0;
     _cardPairsFound = 0;
     _currentCardController = null;

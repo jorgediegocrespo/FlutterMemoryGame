@@ -6,7 +6,6 @@ import 'package:vsync_provider/vsync_provider.dart';
 
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/features/features.dart';
-import 'package:flutter_memory_game/helpers/dialog_helper.dart';
 import 'package:flutter_memory_game/models/models.dart';
 import 'package:flutter_memory_game/themes/colors.dart';
 
@@ -20,16 +19,10 @@ class GamePage extends StatelessWidget {
       create: (context) {
         return GameProvider(
             vsync: VsyncProvider.of(context),
-            gameInfo: arguments! as GameInfo,
-            showGameOver: (gameWon) => finishGame(context, gameWon));
+            gameInfo: arguments! as GameInfo);
       },
       child: GameWidget(arguments: arguments),
     );
-  }
-
-  Future finishGame(BuildContext context, bool gameWon) async {
-    await showDialog(
-        barrierDismissible: false, context: context, builder: (context) => AlertDialog(contentPadding: const EdgeInsets.all(0), content: GameOverPage(arguments: gameWon)));
   }
 }
 
@@ -58,7 +51,8 @@ class GameWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        const Expanded(child: _Board())
+        const Expanded(child: _Board()),
+        
       ],
     )));
   }
@@ -73,7 +67,6 @@ class _BackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final customColors = Theme.of(context).extension<CustomColors>()!;
-    final texts = AppLocalizations.of(context)!;
 
     return Align(
         alignment: Alignment.topLeft,
@@ -86,17 +79,7 @@ class _BackButton extends StatelessWidget {
                     isLoading: gameProvider.isNavigatingBack,
                     color: customColors.buttonColor!,
                     iconData: Icons.arrow_back,
-                    onTap: () async {
-                      gameProvider.isNavigatingBack = true;
-                      bool goBack = await DialogHelper.showAlertDialog(context, texts.gameBackQuestionTitle, texts.gameBackQuestionMessage, texts.ok, texts.cancel);
-                      if (!goBack) {
-                        return;
-                      }
-                      gameProvider.animationController.reverse().whenCompleteOrCancel(() {
-                        Navigator.pop(context);
-                        gameProvider.isNavigatingBack = false;
-                      });
-                    },
+                    onTap: () => gameProvider.goBack(),
                   ));
             }));
   }
@@ -222,7 +205,7 @@ class _Board extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height - 250;
+    final height = MediaQuery.of(context).size.height - 300;
     final width = MediaQuery.of(context).size.width - 10;
     final provider = Provider.of<GameProvider>(context, listen: false);
     final aspectRatio = ((width / provider.columnCount) - 10) / (height / provider.rowCount);
@@ -236,20 +219,23 @@ class _Board extends StatelessWidget {
               child: Selector<GameProvider, List<List<CardInfo?>>>(
                   selector: (_, provider) => provider.board,
                   builder: (_, value, __) {
-                    return GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: aspectRatio, crossAxisCount: provider.columnCount, mainAxisSpacing: 5, crossAxisSpacing: 5),
-                        itemCount: provider.rowCount * provider.columnCount,
-                        itemBuilder: (BuildContext context, int index) {
-                          final int row = index ~/ provider.columnCount;
-                          final int column = (index % provider.columnCount).toInt();
-                          provider.boardControllers![row][column].hideCard();
+                    return Center(
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: aspectRatio, crossAxisCount: provider.columnCount, mainAxisSpacing: 5, crossAxisSpacing: 5),
+                          itemCount: provider.rowCount * provider.columnCount,
+                          itemBuilder: (BuildContext context, int index) {
+                            final int row = index ~/ provider.columnCount;
+                            final int column = (index % provider.columnCount).toInt();
+                            provider.boardControllers![row][column].hideCard();
 
-                          return GestureDetector(
-                              onTap: () => provider.showCard(row, column, provider.boardControllers![row][column]),
-                              child: GameCard(controller: provider.boardControllers![row][column], imageName: "assets/images/${value[row][column]!.imagePath}"));
-                        });
+                            return GestureDetector(
+                                onTap: () => provider.showCard(row, column, provider.boardControllers![row][column]),
+                                child: GameCard(controller: provider.boardControllers![row][column], imageName: "assets/images/${value[row][column]!.imagePath}"));
+                          }),
+                    );
                   }));
         });
   }

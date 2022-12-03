@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 
-class DialogHelper {
-  static Future<bool> showAlertDialog(BuildContext context, String title, String message, String ok, String cancel) async {
+import 'package:flutter_memory_game/main.dart';
+import 'package:flutter_memory_game/services/services.dart';
+
+class DialogService implements DialogServiceBase {
+  
+  @override
+  Future<bool> showAlertDialog(String title, String message, String ok, String cancel) async {
     bool result = false;
 
     await showDialog(
-      context: context,
+      context: navigatorKey.currentContext!,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
@@ -38,5 +43,5 @@ class DialogHelper {
     );
 
     return result;
-  }
+  }  
 }

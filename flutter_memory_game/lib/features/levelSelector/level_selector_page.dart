@@ -7,7 +7,6 @@ import 'package:vsync_provider/vsync_provider.dart';
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/features/features.dart';
 import 'package:flutter_memory_game/models/models.dart';
-import 'package:flutter_memory_game/router/routes.dart';
 import 'package:flutter_memory_game/themes/colors.dart';
 
 class LevelSelectorPage extends StatelessWidget {
@@ -18,22 +17,19 @@ class LevelSelectorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => LevelSelectorProvider(vsync: VsyncProvider.of(context)),
-      child: LevelSelectorWidget(arguments: arguments),
+      create: (context) => LevelSelectorProvider(vsync: VsyncProvider.of(context), gameInfo: arguments as GameInfo),
+      child: const LevelSelectorWidget(),
     );
   }
 }
 
 class LevelSelectorWidget extends StatelessWidget {
-  final Object? arguments;
-
-  const LevelSelectorWidget({Key? key, this.arguments}) : super(key: key);
+  const LevelSelectorWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final levelSelectorProvider = Provider.of<LevelSelectorProvider>(context, listen: false);
     final texts = AppLocalizations.of(context)!;
-    final gameInfo = arguments! as GameInfo;
 
     return Scaffold(
         body: Background(
@@ -43,27 +39,21 @@ class LevelSelectorWidget extends StatelessWidget {
         const SizedBox(height: 50),
         _AnimatedButton(
             animation: levelSelectorProvider.lowAnimation,
-            updateNavigating: (x) => levelSelectorProvider.isNavigatingLow = x,
             selector: (_, provider) => provider.isNavigatingLow,
             text: texts.lowLevel,
-            gameInfo: gameInfo,
-            level: Levels.low),
+            onTap: (_) => levelSelectorProvider.selectLow()),
         const SizedBox(height: 10),
         _AnimatedButton(
             animation: levelSelectorProvider.mediumAnimation,
-            updateNavigating: (x) => levelSelectorProvider.isNavigatingMedium = x,
             selector: (_, provider) => provider.isNavigatingMedium,
             text: texts.mediumLevel,
-            gameInfo: gameInfo,
-            level: Levels.medium),
+            onTap: (_) => levelSelectorProvider.selectMedium()),
         const SizedBox(height: 10),
         _AnimatedButton(
             animation: levelSelectorProvider.highAnimation,
-            updateNavigating: (x) => levelSelectorProvider.isNavigatingHigh = x,
             selector: (_, provider) => provider.isNavigatingHigh,
             text: texts.highLevel,
-            gameInfo: gameInfo,
-            level: Levels.high),
+            onTap: (_) => levelSelectorProvider.selectHigh()),
         const Expanded(child: SizedBox())
       ]),
     ));
@@ -112,13 +102,7 @@ class _BackButton extends StatelessWidget {
                     isLoading: levelSelectorProvider.isNavigatingBack,
                     color: customColors.buttonColor!,
                     iconData: Icons.arrow_back,
-                    onTap: () {
-                      levelSelectorProvider.isNavigatingBack = true;
-                      levelSelectorProvider.animationController.reverse().whenCompleteOrCancel(() {
-                        Navigator.pop(context);
-                        levelSelectorProvider.isNavigatingBack = false;
-                      });
-                    },
+                    onTap: () => levelSelectorProvider.goBack()
                   ));
             }));
   }
@@ -126,25 +110,20 @@ class _BackButton extends StatelessWidget {
 
 class _AnimatedButton extends StatelessWidget {
   final Animation<double> animation;
-  final void Function(bool) updateNavigating;
   final bool Function(BuildContext, LevelSelectorProvider) selector;
+  final void Function(BuildContext) onTap;
   final String text;
-  final Levels level;
-  final GameInfo gameInfo;
 
   const _AnimatedButton({
     Key? key,
     required this.animation,
-    required this.updateNavigating,
     required this.selector,
     required this.text,
-    required this.level,
-    required this.gameInfo,
+    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final levelSelectorProvider = Provider.of<LevelSelectorProvider>(context, listen: false);
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
     return SizedBox(
@@ -156,19 +135,7 @@ class _AnimatedButton extends StatelessWidget {
                   opacity: animation.value,
                   child: Selector<LevelSelectorProvider, bool>(
                       selector: selector,
-                      builder: ((_, value, __) => CustomButton(
-                          text: text,
-                          color: customColors.buttonColor!,
-                          opacity: 0,
-                          isLoading: value,
-                          onTap: () {
-                            updateNavigating(true);
-                            levelSelectorProvider.animationController.reverse().whenCompleteOrCancel(() {
-                              gameInfo.level = level;
-                              Navigator.pushNamed(context, Routes.game, arguments: gameInfo).then((value) => levelSelectorProvider.animationController.forward());
-                              updateNavigating(false);
-                            });
-                          }))));
+                      builder: ((_, value, __) => CustomButton(text: text, color: customColors.buttonColor!, opacity: 0, isLoading: value, onTap: () => onTap(context)))));
             }));
   }
 }

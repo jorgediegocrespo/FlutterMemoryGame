@@ -6,8 +6,6 @@ import 'package:vsync_provider/vsync_provider.dart';
 
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/features/features.dart';
-import 'package:flutter_memory_game/models/models.dart';
-import 'package:flutter_memory_game/router/routes.dart';
 
 class ThemeSelectorPage extends StatelessWidget {
   final Object? arguments;
@@ -18,21 +16,18 @@ class ThemeSelectorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => ThemeSelectorProvider(vsync: VsyncProvider.of(context)),
-      child: ThemeSelectorWidget(arguments: arguments),
+      child: const ThemeSelectorWidget(),
     );
   }
 }
 
 class ThemeSelectorWidget extends StatelessWidget {
-  final Object? arguments;
-
-  const ThemeSelectorWidget({Key? key, this.arguments}) : super(key: key);
+  const ThemeSelectorWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final themeSelectorProvider = Provider.of<ThemeSelectorProvider>(context, listen: false);
     final texts = AppLocalizations.of(context)!;
-    final gameInfo = GameInfo();
 
     return Scaffold(
         body: Background(
@@ -57,9 +52,7 @@ class ThemeSelectorWidget extends StatelessWidget {
                       rectCorner: RectCorner.bottomRight,
                       animation: themeSelectorProvider.dcAnimation,
                       selector: (_, provider) => provider.isNavigatingDc,
-                      updateNavigating: (x) => themeSelectorProvider.isNavigatingDc = x,
-                      theme: Themes.dc,
-                      gameInfo: gameInfo),
+                      onTap: (_) => themeSelectorProvider.selectDc()),
               const SizedBox(width: 20),
               _CardWidget(
                   text: texts.themeSelectorMarvel,
@@ -68,9 +61,7 @@ class ThemeSelectorWidget extends StatelessWidget {
                   rectCorner: RectCorner.bottomLeft,
                   animation: themeSelectorProvider.marvelAnimation,
                   selector: (_, provider) => provider.isNavigatingMarvel,
-                  updateNavigating: (x) => themeSelectorProvider.isNavigatingMarvel = x,
-                  theme: Themes.marvel,
-                  gameInfo: gameInfo),
+                  onTap: (_) => themeSelectorProvider.selectMarvel()),
             ],
           ),
         ),
@@ -87,9 +78,7 @@ class ThemeSelectorWidget extends StatelessWidget {
                   rectCorner: RectCorner.topRight,
                   animation: themeSelectorProvider.simpsonsAnimation,
                   selector: (_, provider) => provider.isNavigatingSimpsons,
-                  updateNavigating: (x) => themeSelectorProvider.isNavigatingSimpsons = x,
-                  theme: Themes.simpsons,
-                  gameInfo: gameInfo),
+                  onTap: (_) => themeSelectorProvider.selectSimpsons()),
               const SizedBox(width: 20),
               _CardWidget(
                   text: texts.themeSelectorStarWars,
@@ -98,9 +87,7 @@ class ThemeSelectorWidget extends StatelessWidget {
                   rectCorner: RectCorner.topLeft,
                   animation: themeSelectorProvider.starWarsAnimation,
                   selector: (_, provider) => provider.isNavigatingStarWars,
-                  updateNavigating: (x) => themeSelectorProvider.isNavigatingStarWars = x,
-                  theme: Themes.starWars,
-                  gameInfo: gameInfo),
+                  onTap: (_) => themeSelectorProvider.selectStarWars()),
             ],
           ),
         ),
@@ -112,31 +99,26 @@ class ThemeSelectorWidget extends StatelessWidget {
 
 class _CardWidget extends StatelessWidget {
   final Animation<double> animation;
-  final void Function(bool) updateNavigating;
   final bool Function(BuildContext, ThemeSelectorProvider) selector;
   final String text;
   final String imageName;
   final HorizontalAligment buttonAligment;
   final RectCorner rectCorner;
-  final Themes theme;
-  final GameInfo gameInfo;
+  final Function(BuildContext) onTap;
 
   const _CardWidget(
       {Key? key,
       required this.text,
       required this.animation,
-      required this.updateNavigating,
       required this.imageName,
       required this.buttonAligment,
       required this.rectCorner,
-      required this.theme,
-      required this.gameInfo, required this.selector})
+      required this.selector, 
+      required this.onTap})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final themeSelectorProvider = Provider.of<ThemeSelectorProvider>(context, listen: false);
-
     return Expanded(
         child: AnimatedBuilder(
       animation: animation,
@@ -151,14 +133,7 @@ class _CardWidget extends StatelessWidget {
                 text: text,
                 isLoading: value,
                 rectCorner: rectCorner,
-                onTap: () {
-                  updateNavigating(true);
-                  themeSelectorProvider.animationController.reverse().whenCompleteOrCancel(() async {
-                    gameInfo.theme = theme;
-                    Navigator.pushNamed(context, Routes.levelSelector, arguments: gameInfo).then((value) => themeSelectorProvider.animationController.forward());
-                    updateNavigating(false);
-                  });
-                })), 
+                onTap: () => onTap(context))), 
               selector: selector)
             );
       },
