@@ -16,6 +16,8 @@ class CustomButton extends StatelessWidget {
     if (isLoading) {
       return MaterialButton(
         onPressed: null,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         child: Container(
           height: 40,
           decoration: BoxDecoration(
@@ -30,6 +32,8 @@ class CustomButton extends StatelessWidget {
     } else {
       return MaterialButton(
         onPressed: onTap,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         child: Container(
           height: 40,
           decoration: BoxDecoration(
