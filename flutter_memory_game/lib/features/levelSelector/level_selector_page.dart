@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:vsync_provider/vsync_provider.dart';
 
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/features/features.dart';
@@ -17,7 +16,7 @@ class LevelSelectorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => LevelSelectorProvider(vsync: VsyncProvider.of(context), gameInfo: arguments as GameInfo),
+      create: (_) => LevelSelectorProvider(gameInfo: arguments as GameInfo),
       child: const LevelSelectorWidget(),
     );
   }

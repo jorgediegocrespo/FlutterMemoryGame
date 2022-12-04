@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:vsync_provider/vsync_provider.dart';
 
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/features/features.dart';
@@ -16,11 +15,7 @@ class GamePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) {
-        return GameProvider(
-            vsync: VsyncProvider.of(context),
-            gameInfo: arguments! as GameInfo);
-      },
+      create: (_) => GameProvider(gameInfo: arguments! as GameInfo),
       child: GameWidget(arguments: arguments),
     );
   }
@@ -52,7 +47,6 @@ class GameWidget extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         const Expanded(child: _Board()),
-        
       ],
     )));
   }
@@ -221,10 +215,10 @@ class _Board extends StatelessWidget {
                   builder: (_, value, __) {
                     return Center(
                       child: GridView.builder(
-                        shrinkWrap: true,
+                          shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(childAspectRatio: aspectRatio, crossAxisCount: provider.columnCount, mainAxisSpacing: 5, crossAxisSpacing: 5),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              childAspectRatio: aspectRatio, crossAxisCount: provider.columnCount, mainAxisSpacing: 5, crossAxisSpacing: 5),
                           itemCount: provider.rowCount * provider.columnCount,
                           itemBuilder: (BuildContext context, int index) {
                             final int row = index ~/ provider.columnCount;

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:get_it/get_it.dart';
+import 'package:vsync_provider/vsync_provider.dart';
 
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/main.dart';
@@ -18,6 +19,7 @@ class GameProvider with ChangeNotifier {
   late Animation<double> attempsAnimation;
   late Animation<double> timerAnimation;
   late Animation<double> boardAnimation;
+
   late NavigationServiceBase _navigationService;
   late DialogServiceBase _dialogService;
 
@@ -34,13 +36,14 @@ class GameProvider with ChangeNotifier {
   GameCardController? _currentCardController;
   bool _isShowingCard = false;
 
-  GameProvider({required TickerProvider vsync, required GameInfo gameInfo}) {
+  GameProvider({required GameInfo gameInfo}) {
     _navigationService = GetIt.I<NavigationServiceBase>();
     _dialogService = GetIt.I<DialogServiceBase>();
     
     _texts = AppLocalizations.of(navigatorKey.currentContext!)!;
     _gameInfo = gameInfo;
     
+    TickerProvider vsync = VsyncProvider.of(navigatorKey.currentContext!);
     animationController = AnimationController(vsync: vsync, duration: const Duration(seconds: 1));
 
     _createBoard();

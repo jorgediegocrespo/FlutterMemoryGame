@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:get_it/get_it.dart';
+import 'package:vsync_provider/vsync_provider.dart';
 
+import 'package:flutter_memory_game/main.dart';
 import 'package:flutter_memory_game/models/models.dart';
 import 'package:flutter_memory_game/router/routes.dart';
 import 'package:flutter_memory_game/services/services.dart';
@@ -13,6 +15,7 @@ class LevelSelectorProvider with ChangeNotifier {
   late Animation<double> highAnimation;
   late Animation<double> mediumAnimation;
   late Animation<double> lowAnimation;
+  
   late NavigationServiceBase _navigationService;
   late GameInfo _gameInfo;
 
@@ -21,9 +24,11 @@ class LevelSelectorProvider with ChangeNotifier {
   bool _isNavigatingLow = false;
   bool _isNavigatingBack = false;
 
-  LevelSelectorProvider({required TickerProvider vsync, required GameInfo gameInfo}) {
+  LevelSelectorProvider({required GameInfo gameInfo}) {
     _gameInfo = gameInfo;
     _navigationService = GetIt.I<NavigationServiceBase>();
+
+    TickerProvider vsync = VsyncProvider.of(navigatorKey.currentContext!);
     animationController = AnimationController(vsync: vsync, duration: const Duration(seconds: 1));
 
     double step = 0.5 / 4.0;
