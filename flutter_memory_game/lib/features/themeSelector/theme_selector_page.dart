@@ -126,7 +126,7 @@ class _CardWidget extends StatelessWidget {
             opacity: animation.value,
             child: Selector<ThemeSelectorProvider, bool>(
               builder: ((_, value, __) => 
-              CardButton(
+              ThemeButton(
                 imageName: imageName,
                 buttonAligment: buttonAligment,
                 text: text,

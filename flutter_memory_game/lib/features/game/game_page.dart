@@ -151,7 +151,7 @@ class _RemainingTimeCard extends StatelessWidget {
                 Center(
                     child: CustomPaint(
                         size: const Size.fromRadius(30),
-                        painter: CirclePainter(backgroundColor: Colors.black38, lineWidth: 3.0, progressPercentage: percentage, progressColor: customColors.chartColor!)))
+                        painter: CircleProgessBar(backgroundColor: Colors.black38, lineWidth: 3.0, progressPercentage: percentage, progressColor: customColors.chartColor!)))
               ],
             );
           }),

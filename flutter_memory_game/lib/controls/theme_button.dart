@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_memory_game/controls/controls.dart';
 import 'package:flutter_memory_game/themes/colors.dart';
 
-class CardButton extends StatelessWidget {
+class ThemeButton extends StatelessWidget {
   final String imageName;
   final HorizontalAligment buttonAligment;
   final String text;
@@ -11,7 +11,7 @@ class CardButton extends StatelessWidget {
   final bool isLoading;
   final GestureTapCallback? onTap;
 
-  const CardButton({
+  const ThemeButton({
     Key? key,
     required this.imageName,
     required this.buttonAligment,

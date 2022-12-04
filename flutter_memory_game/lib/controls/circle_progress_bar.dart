@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class CirclePainter extends CustomPainter {
+class CircleProgessBar extends CustomPainter {
   final Paint _paintBackground = Paint();
   final Paint _paintLine = Paint();
   final double lineWidth;
@@ -10,7 +10,7 @@ class CirclePainter extends CustomPainter {
   final Color progressColor;
   final Color backgroundColor;
 
-  CirclePainter({
+  CircleProgessBar({
     required this.lineWidth,
     required this.progressPercentage,
     required this.progressColor,
